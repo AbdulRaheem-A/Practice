@@ -1,7 +1,47 @@
 import styled from "styled-components"
 import { flexCenter, StyledButton, StyledInput, StyledLabel, StyledOption, StyledSelect, Title } from "../users/User"
+import { useReducer } from "react";
+
+const departmentInitState = {
+    departmentLoader:false,
+    departmentWorkType:"",
+    departmentSalary:"",
+    departmentImg : {
+        file:"",
+        fileName:""
+    }
+};
+
+function Reducer(currState,action){
+
+    const {type,payload} = action;
+
+    switch(type){
+        case "departmentWorkTypeChange":
+            return {
+                ...currState,
+                departmentWorkType:payload
+            }
+        case "departmentSalaryChange":
+            return {
+                ...currState,
+                departmentSalary:payload
+            }
+        case "departmentImgChange":
+            return {
+                ...currState,
+                departmentImg:payload
+            }
+        default :
+            return departmentInitState;
+    }
+}
 
 function DepartmentForm(){
+
+    const [departmentState,departmentDispatch] = useReducer(Reducer,departmentInitState);
+    
+    const {departmentWorkType,departmentSalary,departmentImg:{file,fileName}} = departmentState;
     
     return <>
       <FormContainer>
@@ -15,7 +55,14 @@ function DepartmentForm(){
                 <StyledLabel htmlFor="workType">
                 work type
                 </StyledLabel>
-                <StyledSelect id="workType" >
+                <StyledSelect 
+                id="workType"
+                value={departmentWorkType}
+                onChange={(e)=>departmentDispatch({
+                    type:"departmentWorkTypeChange",
+                    payload:e.target.value
+                })}
+                >
                     <StyledOption>
                         union leader
                     </StyledOption>
@@ -32,7 +79,14 @@ function DepartmentForm(){
                 <StyledLabel htmlFor="salary">
                     salary
                 </StyledLabel>
-                <StyledInput type="text" id="salary"/>
+                <StyledInput 
+                type="text" 
+                id="salary"
+                value={departmentSalary}
+                onChange={(e)=>departmentDispatch({
+                    type:"departmentSalaryChange",
+                    payload:e.target.value
+                })}/>
             </SecondFieldContainer>
 
             <StyledButton type="submit">
@@ -46,7 +100,19 @@ function DepartmentForm(){
                     <StyledImg src="/imgs/profile.png" />
                 </OuterImgContainer>
                 <ImgInputContainer>
-                    <StyledInput type="file" id="img" accept="image/*"/>
+                    <StyledInput 
+                    type="file" 
+                    id="img" 
+                    accept="image/*"
+                    value={fileName}
+                    onChange={(e)=>departmentDispatch({
+                        type:"departmentImgChange",
+                        payload:{
+                            fileName:e.target.value,
+                            file:e.target.files
+                        }
+                    })}
+                    />
                 </ImgInputContainer>
             </OuterPhotoContainer>
         </ImgField>
