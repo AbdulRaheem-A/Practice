@@ -1,7 +1,64 @@
+import { useReducer } from "react";
 import styled, { css } from "styled-components"
+import { Print } from "../../utils/CommonUtil";
+
+const userInitState = {
+    userLoader : false,
+    userName : "",
+    userAge : "",
+    userSex : "",
+    userWork : {
+        workType : "full time",
+        timing : ""
+    },
+    userImg : {
+        file:"",
+        fileName:""
+    }
+};
+
+function Reducer(currState,action){
+
+    const {type,payload} = action;
+
+    switch(type){
+        case "userNameChange":
+            return {
+                ...currState,
+                userName:payload,
+            };
+        case "userAgeChange" :
+            return {
+                ...currState,
+                userAge:payload,
+            }
+        case "userSexChange":
+            return {
+                ...currState,
+                userSex:payload,
+            };
+        case "userWorkChange" :
+            return {
+                ...currState,
+                userWork:payload
+            }
+        case "userImgChange" :
+            return {
+                ...currState,
+                userImg:payload
+            }
+        default :
+            return userInitState;
+    }
+
+}
 
 function UserForm(){
     
+    const [userState,userDispatch] = useReducer(Reducer,userInitState);
+
+    const {userName,userAge,userSex,userWork:{workType,timing},userImg:{file,fileName}} = userState;
+
     return <>
       <StyledForm>
         <Title>
@@ -13,19 +70,40 @@ function UserForm(){
                     <StyledLabel htmlFor="name" name="name">
                         name
                     </StyledLabel>
-                    <StyledInput type="text" id="name"/>
+                    <StyledInput 
+                    type="text" 
+                    id="name" 
+                    value={userName} 
+                    onChange={(e)=>userDispatch({
+                        type:"userNameChange",
+                        payload:e.target.value
+                    })}/>
                 </FirstFieldContainer>
                     <AgeFieldContainer>
                         <StyledLabel htmlFor="age" name="age">
                             age
                         </StyledLabel>
-                        <StyledInput type="text" id="age"/>
+                        <StyledInput 
+                        type="text" 
+                        id="age" 
+                        value={userAge}
+                        onChange={(e)=>userDispatch({
+                            type:"userAgeChange",
+                            payload:e.target.value
+                        })}
+                        />
                     </AgeFieldContainer>
                     <SexFieldContainer>
                         <StyledLabel htmlFor="sex" name="sex">
                             sex
                         </StyledLabel>
-                        <StyledSelect id="sex">
+                        <StyledSelect 
+                        id="sex" 
+                        value={userSex}
+                        onChange={(e)=>userDispatch({
+                            type:"userSexChange",
+                            payload:e.target.value
+                        })}>
                             <option>male</option>
                             <option>female</option>
                         </StyledSelect>
@@ -34,16 +112,43 @@ function UserForm(){
                     <StyledLabel htmlFor="work" name="work">
                         work
                     </StyledLabel>
-                    <StyledSelect id="work">
+                    <StyledSelect 
+                    id="work" 
+                    value={workType}
+                    onChange={(e)=>userDispatch({
+                        type:"userWorkChange",
+                        payload:
+                        {
+                            workType:e.target.value,
+                            timing:undefined,
+                        }
+                    })}>
                         <option>full time</option>
                         <option>part time</option>
                     </StyledSelect>
-                    <StyledSelect id="work">
+                    {
+                    workType!=="full time" 
+                    &&
+                    <StyledSelect 
+                    id="work" 
+                    value={timing}
+                    onChange={(e)=>{
+                        userDispatch({
+                            type:"userWorkChange",
+                            payload:
+                            {
+                                timing:workType!=='full time'?e.target.value:undefined,
+                                workType
+                            }
+                        })
+                    }}
+                    >
                         <option>8.00AM</option>
                         <option>1.00PM</option>
                         <option>6.00PM</option>
                         <option>11.00PM</option>
                     </StyledSelect>
+                    }
                 </ThirdFieldContainer>
             </UserFieldsContainer>
             <PhotoContainer>
@@ -52,10 +157,23 @@ function UserForm(){
                         <StyledImg src="/imgs/profile.png" />
                     </OuterImgContainer>
                     <ImgInputContainer>
-                        <StyledInput type="file" id="img" accept="image/*"/>
-                        <StyledButton>
-                            preview img
-                        </StyledButton>
+                        <StyledInput 
+                        type="file" 
+                        id="img" 
+                        accept="image/*" 
+                        value={fileName}
+                        onChange={
+                        (e)=>{
+                            return userDispatch({
+                                type:"userImgChange",
+                                payload:{
+                                    file:e.target.files,
+                                    fileName:e.target.value
+                                }
+                            })
+                        }
+                        }
+                        />
                     </ImgInputContainer>
                 </OuterPhotoContainer>
             </PhotoContainer>
@@ -154,6 +272,7 @@ export const StyledSelect = styled.select`
     padding:5px;
     text-transform:capitalize;
     width : ${(props)=>props.size==="long"?"100%":null};
+    transition:2s ease-out;
 `
 
 export const StyledOption = styled.option`

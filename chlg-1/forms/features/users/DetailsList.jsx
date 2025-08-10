@@ -58,6 +58,7 @@ const StyledEachElement = styled.li`
     width: 100%;
     ${box_shadow}
     border-radius: 5px;
+    transition:2s ease-out;
 `
 
 const DepartmentContainer =  styled.div`
