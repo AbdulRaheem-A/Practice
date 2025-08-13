@@ -1,10 +1,13 @@
 import styled from "styled-components"
 import { flexCenter, StyledButton, StyledInput, StyledLabel, StyledOption, StyledSelect, Title } from "../users/User"
 import { useReducer } from "react";
+import { FormsBackEndUrl } from "../../../Utilities/CommonUtil";
+
+const departmentWorkTypeArr = ['union leader','employee','manager']
 
 const departmentInitState = {
     departmentLoader:false,
-    departmentWorkType:"",
+    departmentWorkType:departmentWorkTypeArr[0],
     departmentSalary:"",
     departmentImg : {
         file:"",
@@ -42,9 +45,50 @@ function DepartmentForm(){
     const [departmentState,departmentDispatch] = useReducer(Reducer,departmentInitState);
     
     const {departmentWorkType,departmentSalary,departmentImg:{file,fileName}} = departmentState;
+
+    function handleSubmit(e){
+        e.preventDefault();
+
+        async function convertToString64(img){
+
+            return new Promise((resolve,reject)=>{
+                const reader = new FileReader()
+                reader.readAsDataURL(img)
+                reader.onload = (e) => resolve(e.target.result)
+                reader.onerror = (error) =>  reject(error);
+            })
+
+        }
+
+        async function PostFetch(){
+
+            const departmentData = {
+                work : departmentWorkType,
+                salary : departmentSalary,
+                img : {
+                    base64img :  file.length ? await convertToString64(file[0]) : "",
+                    name : file[0].name,
+                }
+            };
+
+            const res = await fetch( `${FormsBackEndUrl}/department`,{
+                method:"POST",
+                body:JSON.stringify(departmentData),
+                headers:{
+                    ["Content-Type"] : "application/json"
+                }
+            });
+            
+            const data = await res.json();
+
+            console.log(data)
+        }
+
+        PostFetch();
+    }
     
     return <>
-      <FormContainer>
+      <FormContainer method="POST" onSubmit={handleSubmit}>
         <Title>
             department
         </Title>
@@ -63,15 +107,12 @@ function DepartmentForm(){
                     payload:e.target.value
                 })}
                 >
-                    <StyledOption>
-                        union leader
-                    </StyledOption>
-                    <StyledOption>
-                        employee
-                    </StyledOption>
-                    <StyledOption>
-                        manager
-                    </StyledOption>
+                    {
+                    departmentWorkTypeArr.map((each,i)=>
+                    <StyledOption key={i} >
+                        {each}
+                    </StyledOption>)
+                    }
                 </StyledSelect>
             </FirstFieldContainer>
 
