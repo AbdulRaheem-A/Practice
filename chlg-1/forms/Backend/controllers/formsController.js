@@ -1,3 +1,5 @@
+const Department = require("../models/department");
+
 const GET_depFormsData = (req,res,next) => {
     console.log(req)
     return res.end();
@@ -5,7 +7,9 @@ const GET_depFormsData = (req,res,next) => {
 
 const POST_depFormsData = (req,res,next) => {
 
-    // console.log(req,'----',res);
+    const {work,salary,img} = req.body;
+
+    Department.FetchAllData();
 
     return res.json(req.body).status(200);
 }
