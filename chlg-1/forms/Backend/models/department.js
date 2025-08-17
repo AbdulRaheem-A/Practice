@@ -12,35 +12,55 @@ function checkFileError(message){
 }
 
 class Department{
+
     constructor(workType,salary,departmentImg){
         this.workType      = workType,
         this.salary        = salary,
         this.departmentImg = departmentImg
     }
 
-    static InsertData(){
-        // console.log(this);
-        // fs.readFile()
-        // fs.writeFile(p)
+    async insertData(){
+        /*fs.appendFile(departmentsPath,)*/
+        const existingData = await Department.FetchAllData()
+        let id = existingData.length
+        const modifiedData = [
+        ...existingData,
+        {
+        id:id+1,
+        department : {
+            work : this.workType,
+            salary : this.salary,
+            departmentImg : this.departmentImg
+        },
+        }
+        ];
+        fs.writeFile(departmentsPath,
+            JSON.stringify(modifiedData,null,2),(err)=>{
+            if(err)
+            throw err;
+        })
     }
 
-    static FetchAllData(){
-        const data = fs.readFile(departmentsPath,(err,data)=>{
+    static async FetchAllData(){
+        let fetchedData = null;
+        return new Promise((resolve,reject)=>{
+            fs.readFile(departmentsPath,(err,data)=>{
             if(err && checkFileError(err.message)){
-                const defaultData = JSON.stringify([]);
+                const defaultData = '';
                 fs.writeFile(departmentsPath,defaultData,(err)=>{
                     if(err)
-                    throw err;
+                    reject(err);
                     else 
-                    return defaultData;
+                    fetchedData = defaultData;
+                    resolve(fetchedData)
                 })
             }
             else{
-                console.log(data);
-                return JSON.parse(data)
+                fetchedData = JSON.parse(data.toString('utf-8'))
+                resolve(fetchedData);
             }
-        })
-        // console.log(data);
+            })
+        });
     }
 }
 

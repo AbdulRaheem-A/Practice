@@ -9,7 +9,11 @@ const POST_depFormsData = (req,res,next) => {
 
     const {work,salary,img} = req.body;
 
-    Department.FetchAllData();
+    const department = new Department(work,salary,img);
+
+    department.insertData();
+
+    // Department.FetchAllData((departments)=>console.log(departments));
 
     return res.json(req.body).status(200);
 }

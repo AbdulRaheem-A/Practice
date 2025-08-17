@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { StyledImg, Title } from "./User"
+import { StyledButton, StyledImg, Title } from "./User"
 import { box_shadow } from "../../GlobalStyles"
 
 function DetailsList(){
@@ -10,15 +10,6 @@ function DetailsList(){
             Users list
         </Title>
         <StyledEachElement>
-            <DepartmentContainer>
-                <DepartmentFields>
-                    <DepWorkTypePara>union leader</DepWorkTypePara>
-                    <DepSalaryPara>19000</DepSalaryPara>
-                </DepartmentFields>
-                <DepartmentImg>
-                    <StyledImg src="imgs/profile.png"/>
-                </DepartmentImg>
-            </DepartmentContainer>
             <UserContainer>
                 <UserFields>
                     <div style={{display:"flex"}}>
@@ -35,6 +26,23 @@ function DetailsList(){
                     <StyledImg src="imgs/profile.png"/>
                 </UserImg>
             </UserContainer>
+            <DepartmentContainer>
+                <DepartmentFields>
+                    <DepWorkTypePara>union leader</DepWorkTypePara>
+                    <DepSalaryPara>19000</DepSalaryPara>
+                </DepartmentFields>
+                <DepartmentImg>
+                    <StyledImg src="imgs/profile.png"/>
+                </DepartmentImg>
+            </DepartmentContainer>
+            <ButtonContainer >
+                <StyledButton>
+                    duplicate
+                </StyledButton>
+                <StyledButton type="delete">
+                    delete
+                </StyledButton>
+            </ButtonContainer>
         </StyledEachElement>
       </StyledContainer>
     </>
@@ -119,4 +127,10 @@ const UserWorkTypePara = styled.p``
 
 const UserWorkTimingPara = styled.p`
     font-size: 12px;
+`
+
+const ButtonContainer = styled.div`
+    justify-content:space-evenly;
+    display:flex;
+    flex-direction: column;
 `

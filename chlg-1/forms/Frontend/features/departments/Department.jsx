@@ -1,9 +1,11 @@
 import styled from "styled-components"
 import { flexCenter, StyledButton, StyledInput, StyledLabel, StyledOption, StyledSelect, Title } from "../users/User"
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import { FormsBackEndUrl } from "../../../Utilities/CommonUtil";
 
 const departmentWorkTypeArr = ['union leader','employee','manager']
+
+const defaultImg = "/imgs/profile.png";
 
 const departmentInitState = {
     departmentLoader:false,
@@ -11,7 +13,8 @@ const departmentInitState = {
     departmentSalary:"",
     departmentImg : {
         file:"",
-        fileName:""
+        fileName:"",
+        base64: defaultImg
     }
 };
 
@@ -40,34 +43,50 @@ function Reducer(currState,action){
     }
 }
 
+async function convertToString64(img){
+
+    return new Promise((resolve,reject)=>{
+        const reader = new FileReader()
+        reader.readAsDataURL(img)
+        reader.onload = (e) => resolve(e.target.result)
+        reader.onerror = (error) =>  reject(error);
+    })
+
+}
+
 function DepartmentForm(){
 
     const [departmentState,departmentDispatch] = useReducer(Reducer,departmentInitState);
     
-    const {departmentWorkType,departmentSalary,departmentImg:{file,fileName}} = departmentState;
+    const {departmentWorkType,departmentSalary,departmentImg:{file,fileName,base64}} = departmentState;
+
+    useEffect(()=>{
+
+        (async () =>{
+            departmentDispatch({
+                type : "departmentImgChange",
+                payload : {
+                    file,
+                    fileName,
+                    base64 : file.length ? await convertToString64(file[0]) : defaultImg
+                }
+            })
+        })()
+
+    },[file])
+
 
     function handleSubmit(e){
         e.preventDefault();
-
-        async function convertToString64(img){
-
-            return new Promise((resolve,reject)=>{
-                const reader = new FileReader()
-                reader.readAsDataURL(img)
-                reader.onload = (e) => resolve(e.target.result)
-                reader.onerror = (error) =>  reject(error);
-            })
-
-        }
-
+        
         async function PostFetch(){
 
             const departmentData = {
                 work : departmentWorkType,
                 salary : departmentSalary,
                 img : {
-                    base64img :  file.length ? await convertToString64(file[0]) : "",
-                    name : file[0].name,
+                    base64img :  base64,
+                    name : fileName,
                 }
             };
 
@@ -85,6 +104,8 @@ function DepartmentForm(){
         }
 
         PostFetch();
+
+        departmentDispatch(departmentInitState);
     }
     
     return <>
@@ -138,7 +159,7 @@ function DepartmentForm(){
         <ImgField>
             <OuterPhotoContainer>
                 <OuterImgContainer>
-                    <StyledImg src="/imgs/profile.png" />
+                    <StyledImg src={`${base64}` }/>
                 </OuterImgContainer>
                 <ImgInputContainer>
                     <StyledInput 
@@ -150,7 +171,8 @@ function DepartmentForm(){
                         type:"departmentImgChange",
                         payload:{
                             fileName:e.target.value,
-                            file:e.target.files
+                            file:e.target.files,
+                            base64
                         }
                     })}
                     />
@@ -196,8 +218,8 @@ const OuterPhotoContainer = styled.div`
     flex-direction: column;
 `
 const OuterImgContainer = styled.div`
-    width: 5rem;
-    height: 6rem;
+    /* width: 5rem; */
+    height: 10rem;
     margin: 10px 0 20px;
     align-self:center;
 `
@@ -205,7 +227,7 @@ const OuterImgContainer = styled.div`
 const StyledImg = styled.img`
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius:10px;
 `
 

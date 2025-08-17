@@ -334,11 +334,27 @@ export const StyledButton = styled.button`
         background-color: #e5e4e4dc;
     }
     padding: ${
-        (props) => props.type === "submit" ?
-        "10px 20px":
-        "10px"
+        (props) => {
+                switch(props.type){
+                case "submit" :
+                    return "10px 20px";
+                case "delete" :
+                    return "10px 20px";
+                default :
+                    return "10px";
+            }
+        }
     };
-    align-self: center;
+    align-self :  
+    ${(props) => {
+          switch(props.type){
+            case "delete" :
+                return "flex-end";
+            default :
+                return "center";
+          }
+        }
+    };
 `
 
 const ImgInputContainer = styled.div`
